@@ -14,9 +14,9 @@ import {
 import { useDict, useHref, useLocale } from "@/lib/i18n/client";
 import { cityLabel, colorLabel, equipmentLabel, localizeOptions, specs } from "@/lib/i18n/labels";
 import {
-  BadgeCheck, Calendar, Car, Check, Coins, Door, Fuel, Gauge, Gearbox,
+  BadgeCheck, Calendar, Car, Check, ChevronDown, Coins, Door, Fuel, Gauge, Gearbox,
   Key, MapPin, Moto, Odometer, Palette, Plus, Reset, Search, ShieldCheck,
-  Sparkle, Transmission, TrendingDown, Wrench,
+  Sliders, Sparkle, Transmission, TrendingDown, Wrench,
 } from "@/components/icons";
 import { VehicleGlyph } from "@/components/VehicleArt";
 
@@ -39,6 +39,9 @@ export function AdvancedSearch() {
   const L = specs(locale);
   const [f, setF] = useState<Partial<Filters>>({ kind: "car" });
   const set = (patch: Partial<Filters>) => setF((p) => ({ ...p, ...patch }));
+  /* الميكانيك/المواصفات/الضمانات وراء زر واحد — أغلب الناس كيبحثو
+     بالماركة والموديل والثمن والسنة، وقلّة كيدقّقو أكثر من هادشي. */
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   const kind = (f.kind ?? "all") as "all" | "car" | "moto";
 
@@ -72,6 +75,12 @@ export function AdvancedSearch() {
       : [...equipmentTags, tag];
     set({ equipment: next.join(",") });
   };
+
+  const advancedActiveCount =
+    (f.fuel ? 1 : 0) + (f.gearbox ? 1 : 0)
+    + (f.color ? 1 : 0) + (f.doors ? 1 : 0) + (f.drivetrain ? 1 : 0) + (f.origin ? 1 : 0)
+    + (f.powerMin ? 1 : 0) + (f.powerMax ? 1 : 0) + equipmentTags.length
+    + (f.goodDealsOnly ? 1 : 0) + (f.inspectedOnly ? 1 : 0) + (f.verifiedOnly ? 1 : 0) + (f.firstHandOnly ? 1 : 0);
 
   function submit() {
     const params = paramsFromFilters(f);
@@ -201,6 +210,31 @@ export function AdvancedSearch() {
           </div>
         </section>
 
+        {/* فلاتر متقدمة — الميكانيك والمواصفات والضمانات وراء زر واحد */}
+        <button
+          type="button"
+          onClick={() => setAdvancedOpen((o) => !o)}
+          aria-expanded={advancedOpen}
+          className="card flex w-full items-center gap-2.5 p-4 text-start transition hover:border-[var(--line-strong)]"
+        >
+          <Sliders size={16} style={{ color: "var(--brand)" }} />
+          <span className="flex-1 text-[14px] font-bold">{t.advSearch.advancedTitle}</span>
+          {advancedActiveCount > 0 && (
+            <span
+              className="num grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-[10.5px] font-bold"
+              style={{ background: "var(--brand)", color: "var(--brand-ink)" }}
+            >
+              {advancedActiveCount}
+            </span>
+          )}
+          <ChevronDown
+            size={16}
+            style={{ color: "var(--text-dim)", transform: advancedOpen ? "rotate(180deg)" : "none", transition: "transform .25s var(--ease-out-soft)" }}
+          />
+        </button>
+
+        {advancedOpen && (
+        <>
         {/* الميكانيك */}
         <section className="card p-5">
           <h2 className="mb-4 flex items-center gap-2 text-[14px] font-bold">
@@ -342,6 +376,8 @@ export function AdvancedSearch() {
             })}
           </div>
         </section>
+        </>
+        )}
       </div>
 
       {/* الملخص */}

@@ -151,7 +151,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
         )}
 
         {/* الهيكل */}
-        <FilterSection title={t.filters.body} Icon={Car} activeCount={filters.body ? 1 : 0}>
+        <FilterSection title={t.filters.body} Icon={Car} activeCount={filters.body ? 1 : 0} defaultOpen={Boolean(filters.body)}>
           <IconTiles
             value={filters.body}
             onChange={(b) => set({ body: b })}
@@ -176,6 +176,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
           title={lockBrand ? t.filters.modelOnly : t.filters.brandModel}
           Icon={BadgeCheck}
           activeCount={(filters.make && !lockBrand ? 1 : 0) + (filters.model ? 1 : 0)}
+          defaultOpen={Boolean((filters.make && !lockBrand) || filters.model)}
         >
           {!lockBrand && (
           <select
@@ -211,7 +212,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
         </FilterSection>
 
         {filters.kind === "moto" && (
-        <FilterSection title="سعة المحرك" Icon={Gauge} activeCount={(filters.displacementMin ? 1 : 0) + (filters.displacementMax ? 1 : 0)}>
+        <FilterSection title="سعة المحرك" Icon={Gauge} activeCount={(filters.displacementMin ? 1 : 0) + (filters.displacementMax ? 1 : 0)} defaultOpen={Boolean(filters.displacementMin || filters.displacementMax)}>
           <div className="grid grid-cols-2 gap-2">
             <input
               type="number" min={49} max={3000} inputMode="numeric" className="field num" dir="ltr"
@@ -232,6 +233,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
           title={t.filters.price}
           Icon={TrendingDown}
           activeCount={(filters.priceMin ? 1 : 0) + (filters.priceMax ? 1 : 0)}
+          defaultOpen={Boolean(filters.priceMin || filters.priceMax)}
         >
           <DualRange
             min={0}
@@ -261,6 +263,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
           title={t.filters.year}
           Icon={Calendar}
           activeCount={(filters.yearMin ? 1 : 0) + (filters.yearMax ? 1 : 0)}
+          defaultOpen={Boolean(filters.yearMin || filters.yearMax)}
         >
           <DualRange
             min={2004}
@@ -275,7 +278,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
         </FilterSection>
 
         {/* الكيلومتراج */}
-        <FilterSection title={t.filters.km} Icon={Gauge} activeCount={filters.kmMax ? 1 : 0}>
+        <FilterSection title={t.filters.km} Icon={Gauge} activeCount={filters.kmMax ? 1 : 0} defaultOpen={Boolean(filters.kmMax)}>
           <input
             type="range"
             min={0}
@@ -305,6 +308,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
           title={t.filters.engine}
           Icon={Fuel}
           activeCount={(filters.fuel ? 1 : 0) + (filters.gearbox ? 1 : 0)}
+          defaultOpen={Boolean(filters.fuel || filters.gearbox)}
         >
           <ChipToggles
             value={filters.fuel}
@@ -321,7 +325,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
         </FilterSection>
 
         {/* حالة المركبة */}
-        <FilterSection title={t.filters.condition} Icon={BadgeCheck} activeCount={filters.condition ? 1 : 0}>
+        <FilterSection title={t.filters.condition} Icon={BadgeCheck} activeCount={filters.condition ? 1 : 0} defaultOpen={Boolean(filters.condition)}>
           <ChipToggles
             value={filters.condition}
             onChange={(c) => set({ condition: c })}
@@ -331,7 +335,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
 
         {/* اللون */}
         {Object.keys(f9s.color).length > 0 && (
-        <FilterSection title={t.filters.color} Icon={Palette} activeCount={filters.color ? 1 : 0}>
+        <FilterSection title={t.filters.color} Icon={Palette} activeCount={filters.color ? 1 : 0} defaultOpen={Boolean(filters.color)}>
           <ChipToggles
             value={filters.color}
             onChange={(c) => set({ color: c })}
@@ -344,7 +348,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
 
         {/* عدد الأبواب — سيارات فقط */}
         {filters.kind !== "moto" && Object.keys(f9s.doors).length > 0 && (
-        <FilterSection title={t.filters.doors} Icon={Door} activeCount={filters.doors ? 1 : 0}>
+        <FilterSection title={t.filters.doors} Icon={Door} activeCount={filters.doors ? 1 : 0} defaultOpen={Boolean(filters.doors)}>
           <ChipToggles
             value={filters.doors ? String(filters.doors) : ""}
             onChange={(v) => set({ doors: v ? Number(v) : undefined })}
@@ -360,6 +364,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
           title={t.filters.power}
           Icon={Gauge}
           activeCount={(filters.powerMin ? 1 : 0) + (filters.powerMax ? 1 : 0)}
+          defaultOpen={Boolean(filters.powerMin || filters.powerMax)}
         >
           <DualRange
             min={0}
@@ -375,7 +380,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
 
         {/* الدفع — سيارات فقط */}
         {filters.kind !== "moto" && (
-        <FilterSection title={t.filters.drivetrain} Icon={Car} activeCount={filters.drivetrain ? 1 : 0}>
+        <FilterSection title={t.filters.drivetrain} Icon={Car} activeCount={filters.drivetrain ? 1 : 0} defaultOpen={Boolean(filters.drivetrain)}>
           <ChipToggles
             value={filters.drivetrain}
             onChange={(d) => set({ drivetrain: d })}
@@ -385,7 +390,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
         )}
 
         {/* مصدر السيارة */}
-        <FilterSection title={t.filters.origin} Icon={MapPin} activeCount={filters.origin ? 1 : 0}>
+        <FilterSection title={t.filters.origin} Icon={MapPin} activeCount={filters.origin ? 1 : 0} defaultOpen={Boolean(filters.origin)}>
           <ChipToggles
             value={filters.origin}
             onChange={(o) => set({ origin: o })}
@@ -394,7 +399,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
         </FilterSection>
 
         {/* المواصفات والخيارات */}
-        <FilterSection title={t.filters.equipment} Icon={Sparkle} activeCount={equipmentTags.length}>
+        <FilterSection title={t.filters.equipment} Icon={Sparkle} activeCount={equipmentTags.length} defaultOpen={equipmentTags.length > 0}>
           <div className="flex flex-wrap gap-1.5">
             {EQUIPMENT.map((eq) => {
               const on = equipmentTags.includes(eq);
@@ -422,7 +427,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
         </FilterSection>
 
         {/* المدينة */}
-        <FilterSection title={t.filters.city} Icon={MapPin} activeCount={filters.city ? 1 : 0}>
+        <FilterSection title={t.filters.city} Icon={MapPin} activeCount={filters.city ? 1 : 0} defaultOpen={Boolean(filters.city)}>
           <ChipToggles
             value={filters.city}
             onChange={(c) => set({ city: c })}
@@ -440,7 +445,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
         </FilterSection>
 
         {/* الثقة */}
-        <FilterSection title={t.filters.trust} Icon={ShieldCheck} activeCount={filters.trustMin ? 1 : 0}>
+        <FilterSection title={t.filters.trust} Icon={ShieldCheck} activeCount={filters.trustMin ? 1 : 0} defaultOpen={Boolean(filters.trustMin)}>
           <input
             type="range"
             min={0}
@@ -467,6 +472,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
           title={t.filters.guarantees}
           Icon={ShieldCheck}
           activeCount={[filters.goodDealsOnly, filters.inspectedOnly, filters.verifiedOnly, filters.firstHandOnly, filters.urgentOnly].filter(Boolean).length}
+          defaultOpen={[filters.goodDealsOnly, filters.inspectedOnly, filters.verifiedOnly, filters.firstHandOnly, filters.urgentOnly].some(Boolean)}
         >
           <div className="grid gap-1.5">
             <SwitchRow

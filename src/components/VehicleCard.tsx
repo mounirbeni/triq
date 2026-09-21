@@ -52,7 +52,7 @@ function CardActions({ v }: { v: Vehicle }) {
   const fav = isFavorite(v.id);
   const cmp = inCompare(v.id);
   const base =
-    "grid h-9 w-9 place-items-center rounded-lg border transition hover:-translate-y-0.5";
+    "grid h-9 w-9 place-items-center rounded-lg border transition hover:-translate-y-0.5 active:scale-90";
   return (
     <div className="flex shrink-0 gap-1.5">
       <button

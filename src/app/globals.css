@@ -168,6 +168,10 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+    /* بلا هادشي، الضغط على أي رابط/زر فالهاتف كيطلع فلاش رمادي
+       افتراضي ديال المتصفح — هو اللي كيخلي الموقع يبان "صفحة ويب"
+       ماشي تطبيق. كنعوّضوه بردود فعل ديالنا (:active أسفله). */
+    -webkit-tap-highlight-color: transparent;
   }
 
   h1, h2, h3, h4 {
@@ -300,6 +304,13 @@
     border-color: var(--line-strong);
     box-shadow: var(--shadow-lg), var(--hairline);
   }
+  /* على اللمس ماكاينش hover: البطاقة تبقى بلا أي رد فعل للضغطة —
+     هادشي هو اللي كيحس المستخدم بيه "موقع ويب" ماشي تطبيق. ضغطة
+     خفيفة للداخل (scale) وسريعة كتعطي إحساس اللمس الفوري. */
+  .card-hover:active {
+    transform: scale(0.98);
+    transition-duration: 0.1s;
+  }
 
   /* ---- الأزرار ---- */
   .btn {
@@ -318,6 +329,7 @@
     border: 1px solid transparent;
   }
   .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn:active:not(:disabled) { transform: scale(0.96); transition-duration: 0.1s; }
 
   .btn-primary {
     background: var(--brand);

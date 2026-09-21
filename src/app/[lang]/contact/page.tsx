@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Link } from "@/components/Link";
 import { ContactForm } from "@/components/ContactForm";
 import { dictionaryOf, getDictionary } from "@/lib/i18n/server";
-import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 import { Clock, MapPin, Message, Phone, ShieldAlert } from "@/components/icons";
 
 export async function generateMetadata({
@@ -14,7 +15,7 @@ export async function generateMetadata({
   return {
     title: t.contactPage.metaTitle,
     description: t.contactPage.metaDescription,
-    alternates: { canonical: localePath("/contact", locale) },
+    alternates: localeAlternates("/contact", locale),
   };
 }
 

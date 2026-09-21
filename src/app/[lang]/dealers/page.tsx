@@ -3,7 +3,8 @@ import { Link } from "@/components/Link";
 import { getDealerCounts, getDealers } from "@/lib/source";
 import { formatNumber } from "@/lib/format";
 import { dictionaryOf, getDictionary, getLocale } from "@/lib/i18n/server";
-import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 import { cityLabel } from "@/lib/i18n/labels";
 import { ArrowLeft, BadgeCheck, Car, Clock, MapPin, Star, Users } from "@/components/icons";
 
@@ -16,7 +17,7 @@ export async function generateMetadata({
   return {
     title: t.dealersPage.metaTitle,
     description: t.dealersPage.metaDesc,
-    alternates: { canonical: localePath("/dealers", locale) },
+    alternates: localeAlternates("/dealers", locale),
   };
 }
 

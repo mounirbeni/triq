@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { EstimateTool } from "@/components/EstimateTool";
 import { Sparkle } from "@/components/icons";
 import { dictionaryOf, getDictionary } from "@/lib/i18n/server";
-import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 
 export async function generateMetadata({
   params,
@@ -11,7 +12,7 @@ export async function generateMetadata({
   const locale = isLocale(lang) ? lang : DEFAULT_LOCALE;
   const t = await dictionaryOf(locale);
   return {
-    alternates: { canonical: localePath("/valuation", locale) },
+    alternates: localeAlternates("/valuation", locale),
     title: t.valuationPage.metaTitle,
     description: t.valuationPage.metaDesc,
   };

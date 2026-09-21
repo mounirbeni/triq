@@ -4,7 +4,8 @@ import { getDealers, getStats } from "@/lib/source";
 import { CITIES } from "@/lib/cities";
 import { formatNumber } from "@/lib/format";
 import { dictionaryOf, getDictionary } from "@/lib/i18n/server";
-import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 import {
   ArrowLeft, BadgeCheck, Calculator, Car, MapPin, Scale, ShieldCheck, Sparkle,
   Users, Wrench,
@@ -19,7 +20,7 @@ export async function generateMetadata({
   return {
     title: t.aboutPage.metaTitle,
     description: t.aboutPage.metaDescription,
-    alternates: { canonical: localePath("/about", locale) },
+    alternates: localeAlternates("/about", locale),
   };
 }
 

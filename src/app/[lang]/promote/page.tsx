@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { PromoteClient } from "@/components/PromoteClient";
 import { dictionaryOf, getDictionary } from "@/lib/i18n/server";
-import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 
 export async function generateMetadata({
   params,
@@ -13,7 +14,7 @@ export async function generateMetadata({
   return {
     title: t.promotePage.metaTitle,
     description: t.promotePage.metaDesc,
-    alternates: { canonical: localePath("/promote", locale) },
+    alternates: localeAlternates("/promote", locale),
   };
 }
 

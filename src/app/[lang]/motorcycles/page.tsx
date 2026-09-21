@@ -4,7 +4,8 @@ import { VehiclesClient } from "@/components/search/VehiclesClient";
 import { VehiclesPageSkeleton } from "@/components/VehicleGridSkeleton";
 import { PageTransition } from "@/components/PageTransition";
 import { dictionaryOf, getDictionary } from "@/lib/i18n/server";
-import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 
 export async function generateMetadata({
   params,
@@ -15,7 +16,7 @@ export async function generateMetadata({
   return {
     title: t.pages.motos.metaTitle,
     description: t.pages.motos.metaDesc,
-    alternates: { canonical: localePath("/motorcycles", locale) },
+    alternates: localeAlternates("/motorcycles", locale),
   };
 }
 

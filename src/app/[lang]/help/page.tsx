@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Link } from "@/components/Link";
 import { dictionaryOf, getDictionary } from "@/lib/i18n/server";
-import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 import {
   ArrowLeft, BadgeCheck, Car, Coins, FileText, Help, Message, ShieldAlert,
   ShieldCheck, Wallet, Wrench,
@@ -16,7 +17,7 @@ export async function generateMetadata({
   return {
     title: t.helpPage.metaTitle,
     description: t.helpPage.metaDescription,
-    alternates: { canonical: localePath("/help", locale) },
+    alternates: localeAlternates("/help", locale),
   };
 }
 

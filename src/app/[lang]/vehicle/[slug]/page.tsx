@@ -12,6 +12,7 @@ import { formatNumber } from "@/lib/format";
 import { jsonLdHtml } from "@/lib/jsonLd";
 import { dictionaryOf, getDictionary, getLocale } from "@/lib/i18n/server";
 import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { absoluteUrl, localeAlternates } from "@/lib/site";
 import {
   cityLabel, colorLabel, dhUnit, equipmentLabel, fill, fmtDate, fmtDh, fmtKm,
   fmtMonthYear, fmtTimeAgo, includedItemLabel, kmUnit, knownIssueLabel, specs as specLabels,
@@ -63,6 +64,8 @@ export async function generateMetadata({
   const v = found.vehicle;
   const L = specLabels(locale);
   const title = `${v.make} ${v.model} ${v.version} ${v.year} — ${fmtDh(v.price, locale)} ${t.vehicle.metaIn} ${cityLabel(v.city, locale)}`;
+  // الصورة الأصلية (ماشي thumbnail) — نتائج مشاركة/بحث أوضح
+  const ogImage = v.media?.find((m) => m.kind === "photo")?.url ?? v.cover;
   return {
     title,
     description: fill(t.vehicle.metaDesc, {
@@ -70,8 +73,12 @@ export async function generateMetadata({
       km: fmtKm(v.km, locale), fuel: L.fuel[v.fuel], gearbox: L.gearbox[v.gearbox],
       trust: String(trustOf(v).score),
     }),
-    openGraph: { title, type: "article" },
-    alternates: { canonical: localePath(`/vehicle/${slug}`, locale) },
+    openGraph: {
+      title,
+      type: "article",
+      ...(ogImage ? { images: [{ url: ogImage, alt: title }] } : {}),
+    },
+    alternates: localeAlternates(`/vehicle/${slug}`, locale),
   };
 }
 
@@ -149,10 +156,18 @@ export default async function VehiclePage({
     ...(v.keysCount != null ? [{ Icon: Key, label: sp.keys, value: String(v.keysCount) }] : []),
   ];
 
+  const pageUrl = absoluteUrl(localePath(`/vehicle/${slug}`, locale));
+  const photoUrls = (v.media ?? [])
+    .filter((m) => m.kind === "photo")
+    .map((m) => m.url)
+    .slice(0, 8);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": v.kind === "car" ? "Car" : "Motorcycle",
     name: `${v.make} ${v.model} ${v.version}`,
+    url: pageUrl,
+    ...(photoUrls.length > 0 ? { image: photoUrls } : {}),
     brand: { "@type": "Brand", name: v.make },
     model: v.model,
     vehicleModelDate: String(v.year),
@@ -160,19 +175,41 @@ export default async function VehiclePage({
     fuelType: L.fuel[v.fuel],
     vehicleTransmission: L.gearbox[v.gearbox],
     color: v.color,
+    itemCondition: "https://schema.org/UsedCondition",
     offers: {
       "@type": "Offer",
+      url: pageUrl,
       price: v.price,
       priceCurrency: "MAD",
       availability: "https://schema.org/InStock",
+      itemCondition: "https://schema.org/UsedCondition",
       areaServed: cityLabel(v.city, locale),
     },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: t.vehicle.home, item: absoluteUrl(localePath("/", locale)) },
+      {
+        "@type": "ListItem", position: 2,
+        name: v.kind === "car" ? t.vehicle.cars : t.vehicle.motos,
+        item: absoluteUrl(localePath(section, locale)),
+      },
+      {
+        "@type": "ListItem", position: 3, name: v.make,
+        item: absoluteUrl(localePath(`${section}/${brandSlug(v.make)}`, locale)),
+      },
+      { "@type": "ListItem", position: 4, name: `${v.model} ${v.year}`, item: pageUrl },
+    ],
   };
 
   return (
     <PageTransition>
     <div className="mx-auto max-w-[1400px] px-4 py-6 pb-24 lg:pb-6">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(breadcrumbJsonLd) }} />
 
       <nav className="mb-5 flex flex-wrap items-center gap-1 text-[11px]" style={{ color: "var(--text-dim)" }}>
         <Link href="/" className="transition hover:text-[var(--brand)]" transitionTypes={["nav-back"]}>{t.vehicle.home}</Link>

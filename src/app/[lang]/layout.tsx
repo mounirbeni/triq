@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { IBM_Plex_Sans_Arabic, Noto_Kufi_Arabic, Space_Grotesk } from "next/font/google";
 import "../globals.css";
-import { DEFAULT_LOCALE, DIR, HTML_LANG, isLocale, LOCALES } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, DIR, HTML_LANG, isLocale, localePath, LOCALES, type Locale } from "@/lib/i18n/config";
 import { dictionaryOf } from "@/lib/i18n/server";
 import { I18nProvider } from "@/lib/i18n/client";
 import { AppProvider } from "@/store/app";
@@ -15,7 +15,8 @@ import { CompareBar } from "@/components/CompareBar";
 import { PwaRegister } from "@/components/PwaRegister";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { Tour } from "@/components/Tour";
-import { siteUrl } from "@/lib/site";
+import { absoluteUrl, localeAlternates, siteUrl } from "@/lib/site";
+import { jsonLdHtml } from "@/lib/jsonLd";
 
 /** نص المتن */
 const body = IBM_Plex_Sans_Arabic({
@@ -56,21 +57,74 @@ export async function generateMetadata({
     },
     description: m.description,
     keywords: m.keywords,
+    alternates: localeAlternates("/", locale),
     openGraph: {
       type: "website",
       locale: locale === "fr" ? "fr_MA" : "ar_MA",
+      alternateLocale: locale === "fr" ? "ar_MA" : "fr_MA",
       siteName: "Tarique",
       title: m.title,
       description: m.ogDescription,
       images: [{ url: "/hero-vehicles.webp", width: 1774, height: 887, alt: m.ogImageAlt }],
     },
-    robots: { index: true, follow: true },
+    twitter: {
+      card: "summary_large_image",
+      title: m.title,
+      description: m.ogDescription,
+      images: ["/hero-vehicles.webp"],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large" },
+    },
     /* ملي كيتزاد للشاشة الرئيسية فiOS: بلا شريط سفاري، وباسم مختصر */
     appleWebApp: {
       capable: true,
       title: m.appleTitle,
       statusBarStyle: "black-translucent",
     },
+    ...(process.env.GOOGLE_SITE_VERIFICATION
+      ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
+      : {}),
+  };
+}
+
+/**
+ * Organization وWebSite — كتعرّف لجوجل بلي «طريق» كيان واحد عبر كل
+ * اللغات، وSearchAction كتفتح الباب لصندوق بحث فنتائج البحث (sitelinks
+ * search box) كيوجّه مباشرة لصفحة السيارات مع نتيجة البحث.
+ */
+function organizationJsonLd(locale: Locale) {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${siteUrl()}/#organization`,
+        name: "Tarique",
+        alternateName: "طريق",
+        url: siteUrl(),
+        /* Google كيرفض SVG فـLogo rich result — لازم راستر */
+        logo: absoluteUrl("/icons/icon-512.png"),
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${siteUrl()}/#website`,
+        name: "Tarique",
+        url: siteUrl(),
+        publisher: { "@id": `${siteUrl()}/#organization` },
+        inLanguage: [HTML_LANG[locale]],
+        potentialAction: {
+          "@type": "SearchAction",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: `${absoluteUrl(localePath("/cars", locale))}?q={search_term_string}`,
+          },
+          "query-input": "required name=search_term_string",
+        },
+      },
+    ],
   };
 }
 
@@ -115,6 +169,10 @@ export default async function RootLayout({
         {/* Next كيصيفط mobile-web-app-capable وحدو؛ آيفون قبل iOS 16.4
             كيقرا غير هاد الوسم القديم باش يفتح بلا شريط سفاري */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml(organizationJsonLd(lang)) }}
+        />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-screen antialiased">

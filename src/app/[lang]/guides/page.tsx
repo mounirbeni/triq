@@ -3,7 +3,8 @@ import { Link } from "@/components/Link";
 import { guidesFor } from "@/lib/data/guides";
 import { fmtDate } from "@/lib/i18n/labels";
 import { dictionaryOf, getDictionary, getLocale } from "@/lib/i18n/server";
-import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 import { ArrowLeft, Car, Clock, FileText, GUIDE_ICONS, Moto, ShieldCheck } from "@/components/icons";
 
 const KIND_ICON = { car: Car, moto: Moto, general: ShieldCheck } as const;
@@ -18,7 +19,7 @@ export async function generateMetadata({
   return {
     title: t.guidesPage.metaTitle,
     description: t.guidesPage.metaDesc,
-    alternates: { canonical: localePath("/guides", locale) },
+    alternates: localeAlternates("/guides", locale),
   };
 }
 

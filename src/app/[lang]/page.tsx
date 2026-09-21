@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Link } from "@/components/Link";
 import { vehicleHref } from "@/lib/slug";
 import { HeroSearch } from "@/components/HeroSearch";
@@ -5,6 +6,8 @@ import { BrandTile } from "@/components/BrandMark";
 import { SuggestedForYou } from "@/components/SuggestedForYou";
 import { PageTransition } from "@/components/PageTransition";
 import { getDictionary, getLocale } from "@/lib/i18n/server";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 import { VehicleCard } from "@/components/VehicleCard";
 import { VehicleArt, VehicleGlyph } from "@/components/VehicleArt";
 import { TrustRing } from "@/components/TrustBadge";
@@ -66,6 +69,14 @@ const TRUST_POINTS_META = [
   { key: "allCities", Icon: MapPin, href: "/cars" },
   { key: "privacy", Icon: Lock, href: "/privacy" },
 ] as const;
+
+export async function generateMetadata({
+  params,
+}: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params;
+  const locale = isLocale(lang) ? lang : DEFAULT_LOCALE;
+  return { alternates: localeAlternates("/", locale) };
+}
 
 export default async function HomePage() {
   const dict = await getDictionary();

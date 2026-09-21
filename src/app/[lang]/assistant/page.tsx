@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { AssistantClient } from "@/components/AssistantClient";
 import { dictionaryOf } from "@/lib/i18n/server";
-import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 
 export async function generateMetadata({
   params,
@@ -12,7 +13,7 @@ export async function generateMetadata({
   return {
     title: t.assistantPage.metaTitle,
     description: t.assistantPage.metaDesc,
-    alternates: { canonical: localePath("/assistant", locale) },
+    alternates: localeAlternates("/assistant", locale),
   };
 }
 

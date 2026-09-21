@@ -5,7 +5,8 @@ import { guidesFor, guideBySlugFor } from "@/lib/data/guides";
 import { fmtDate } from "@/lib/i18n/labels";
 import { jsonLdHtml } from "@/lib/jsonLd";
 import { dictionaryOf, getDictionary, getLocale } from "@/lib/i18n/server";
-import { DEFAULT_LOCALE, HTML_LANG, isLocale, localePath } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, HTML_LANG, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 import { ArrowLeft, Check, ChevronLeft, Clock, FileText } from "@/components/icons";
 
 /* السطرين التاليين نفس السبب فباقي صفحات [lang]/.../[slug]: التخطيط
@@ -25,7 +26,7 @@ export async function generateMetadata({
   return {
     title: g.title,
     description: g.excerpt,
-    alternates: { canonical: localePath(`/guides/${slug}`, locale) },
+    alternates: localeAlternates(`/guides/${slug}`, locale),
     openGraph: { title: g.title, description: g.excerpt, type: "article" },
   };
 }

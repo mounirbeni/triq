@@ -5,6 +5,7 @@ import { formatNumber } from "@/lib/format";
 import { userBadges } from "@/lib/userBadges";
 import { dictionaryOf, getDictionary, getLocale } from "@/lib/i18n/server";
 import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 import { cityLabel, sellerDisplayName } from "@/lib/i18n/labels";
 import { VehicleCard } from "@/components/VehicleCard";
 import { Avatar } from "@/components/Avatar";
@@ -30,7 +31,7 @@ export async function generateMetadata({
     title: `${seller.name} — ${city}`,
     description: `${t.sellerPage.metaDescPrefix} ${seller.name} — Tarique — ${city}.`,
     robots: { index: false, follow: true },
-    alternates: { canonical: localePath(`/seller/${id}`, locale) },
+    alternates: localeAlternates(`/seller/${id}`, locale),
   };
 }
 

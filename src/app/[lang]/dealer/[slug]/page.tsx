@@ -5,7 +5,8 @@ import { getDealer, getDealerListings } from "@/lib/source";
 import { formatNumber } from "@/lib/format";
 import { jsonLdHtml } from "@/lib/jsonLd";
 import { dictionaryOf, getDictionary, getLocale } from "@/lib/i18n/server";
-import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 import { cityLabel } from "@/lib/i18n/labels";
 import { trustOf } from "@/lib/market";
 import { brandSlug } from "@/lib/slug";
@@ -37,7 +38,7 @@ export async function generateMetadata({
   return {
     title: `${d.name} — ${cityLabel(d.city, locale)}`,
     description: `${d.tagline}. ${d.about.slice(0, 120)}`,
-    alternates: { canonical: localePath(`/dealer/${slug}`, locale) },
+    alternates: localeAlternates(`/dealer/${slug}`, locale),
   };
 }
 

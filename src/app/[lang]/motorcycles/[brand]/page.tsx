@@ -6,7 +6,8 @@ import { VehiclesPageSkeleton } from "@/components/VehicleGridSkeleton";
 import { PageTransition } from "@/components/PageTransition";
 import { brandFromSlug } from "@/lib/slug";
 import { dictionaryOf, getDictionary } from "@/lib/i18n/server";
-import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 
 /* الصفحة كتّرندر عند كل طلب.
 
@@ -30,7 +31,7 @@ export async function generateMetadata({
   return {
     title: t.pages.brand.motosMetaTitle.replace("{make}", make),
     description: t.pages.brand.motosMetaDesc.replace("{make}", make),
-    alternates: { canonical: localePath(`/motorcycles/${brand}`, locale) },
+    alternates: localeAlternates(`/motorcycles/${brand}`, locale),
   };
 }
 

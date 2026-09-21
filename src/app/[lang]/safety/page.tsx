@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Link } from "@/components/Link";
 import { SafetyChecklist } from "@/components/SafetyChecklist";
 import { dictionaryOf, getDictionary } from "@/lib/i18n/server";
-import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 import { AlertTriangle, ArrowLeft, BadgeCheck, ClipboardCheck, FileText, ShieldCheck, Wrench } from "@/components/icons";
 
 export async function generateMetadata({
@@ -14,7 +15,7 @@ export async function generateMetadata({
   return {
     title: t.safetyPage.metaTitle,
     description: t.safetyPage.metaDescription,
-    alternates: { canonical: localePath("/safety", locale) },
+    alternates: localeAlternates("/safety", locale),
   };
 }
 

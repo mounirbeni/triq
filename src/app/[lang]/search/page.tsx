@@ -4,7 +4,8 @@ import { AdvancedSearch } from "@/components/AdvancedSearch";
 import { SmartSearch } from "@/components/SmartSearch";
 import { Search } from "@/components/icons";
 import { dictionaryOf, getDictionary } from "@/lib/i18n/server";
-import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 
 export async function generateMetadata({
   params,
@@ -15,7 +16,7 @@ export async function generateMetadata({
   return {
     title: t.searchPage.metaTitle,
     description: t.searchPage.metaDesc,
-    alternates: { canonical: localePath("/search", locale) },
+    alternates: localeAlternates("/search", locale),
   };
 }
 

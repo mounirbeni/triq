@@ -208,7 +208,7 @@ export default async function InspectionPage() {
             <h2 className="h-section">{t.inspectionPage.availableNowTitle}</h2>
             <Link href="/vehicles?inspected=1" className="btn btn-ghost btn-sm">{t.inspectionPage.all} <ArrowLeft size={14} className="dir-flip" /></Link>
           </header>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
             {inspected.map((v) => <VehicleCard key={v.id} v={v} compact />)}
           </div>
         </section>

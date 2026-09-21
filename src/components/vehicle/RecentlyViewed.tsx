@@ -42,7 +42,7 @@ export function RecentlyViewed({ currentId, heading, limit = 4 }: Props) {
         <Clock size={20} style={{ color: "var(--brand)" }} />
         {heading ?? t.recent.heading}
       </h2>
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
         {items.map((r) => (
           <VehicleCard key={r.id} v={r} compact />
         ))}

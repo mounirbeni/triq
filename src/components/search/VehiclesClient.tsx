@@ -335,7 +335,7 @@ export function VehiclesClient({
               <div
                 className={
                   view === "grid"
-                    ? "grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
+                    ? "grid grid-cols-2 gap-5 xl:grid-cols-3"
                     : "flex flex-col gap-4"
                 }
               >

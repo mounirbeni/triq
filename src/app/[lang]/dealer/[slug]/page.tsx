@@ -155,7 +155,7 @@ export default async function DealerPage({ params }: { params: Promise<{ lang: s
                 </p>
               </div>
               {listings.length ? (
-                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="grid grid-cols-2 gap-5 xl:grid-cols-3">
                   {listings.map((v) => <VehicleCard key={v.id} v={v} compact />)}
                 </div>
               ) : (

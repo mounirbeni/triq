@@ -111,6 +111,24 @@ function Badges({ v, featured = false }: { v: Vehicle; featured?: boolean }) {
   );
 }
 
+/** زر مفضلة عائم فوق الصورة — بديل مضغوط لشريط الأزرار السفلي، خاص بعرض الهاتف (عمودين) */
+function FavoriteOverlay({ v }: { v: Vehicle }) {
+  const t = useDict();
+  const { isFavorite, toggleFavorite } = useApp();
+  const fav = isFavorite(v.id);
+  return (
+    <button
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(v.id); }}
+      aria-label={fav ? t.card.removeFavorite : t.card.addFavorite}
+      aria-pressed={fav}
+      className="sm:hidden absolute top-3 end-3 z-10 grid h-8 w-8 place-items-center rounded-lg backdrop-blur-md transition active:scale-90"
+      style={{ background: fav ? "var(--bad)" : "rgba(10,30,61,0.65)", color: "#fff" }}
+    >
+      <Heart size={15} filled={fav} />
+    </button>
+  );
+}
+
 function MediaCount({ v }: { v: Vehicle }) {
   return (
     <div className="absolute bottom-3 start-3 z-10 flex gap-1.5">
@@ -156,9 +174,26 @@ export function VehicleCard({
           </ViewTransition>
           <Badges v={v} featured={featured} />
           <MediaCount v={v} />
+          <FavoriteOverlay v={v} />
         </div>
 
-        <div className="p-4">
+        {/* ---- عرض مضغوط: عمودين فالهاتف — الثمن وبيانات أساسية بسطر واحد ---- */}
+        <div className="p-2.5 sm:hidden">
+          <div className="flex items-center justify-between gap-2">
+            <Price value={v.price} className="text-[15px] font-extrabold tracking-tight" />
+            <TrustDot trust={trust} />
+          </div>
+          <h3 className="mt-1 truncate text-[12.5px] font-bold leading-snug">
+            {v.make} {v.model}
+          </h3>
+          <p className="mt-0.5 truncate text-[10.5px]" style={{ color: "var(--text-dim)" }}>
+            <span className="num">{v.year}</span> · <span className="num">{formatNumber(v.km)}</span> {kmUnit(locale)} · {cityLabel(v.city, locale)}
+          </p>
+          <div className="mt-1.5"><FairPriceTag fp={fp} /></div>
+        </div>
+
+        {/* ---- العرض الكامل: من sm فما فوق ---- */}
+        <div className="hidden p-4 sm:block">
           <div className="mb-3 flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h3 className="truncate text-[15px] font-bold leading-snug transition-colors group-hover:text-[var(--brand)]">
@@ -195,7 +230,7 @@ export function VehicleCard({
       </Link>
 
       <div
-        className="flex items-center justify-between gap-2 border-t px-4 py-2.5"
+        className="hidden items-center justify-between gap-2 border-t px-4 py-2.5 sm:flex"
         style={{ borderColor: "var(--line-soft)", background: "var(--surface-2)" }}
       >
         <Link

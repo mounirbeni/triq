@@ -100,7 +100,7 @@ export function FavoritesClient() {
               </button>
             </div>
 
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-2 gap-5 lg:grid-cols-3">
               {items.map((v) => {
                 const on = isWatched(v.id);
                 return (

@@ -27,7 +27,14 @@ export function VehicleCardSkeleton({ view = "grid" }: { view?: "grid" | "list" 
   return (
     <div className="card overflow-hidden">
       <div className="skeleton aspect-[16/10]" />
-      <div className="space-y-2.5 p-4">
+      {/* عمودين فالهاتف — هيكل مضغوط بنفس نسب البطاقة الحقيقية */}
+      <div className="space-y-1.5 p-2.5 sm:hidden">
+        <div className="skeleton h-4 w-2/3 rounded" />
+        <div className="skeleton h-3 w-3/4 rounded" />
+        <div className="skeleton h-3 w-1/2 rounded" />
+        <div className="skeleton h-4 w-1/3 rounded" />
+      </div>
+      <div className="hidden space-y-2.5 p-4 sm:block">
         <div className="skeleton h-4 w-3/4 rounded" />
         <div className="skeleton h-3 w-1/2 rounded" />
         <div className="mt-3 flex gap-2">
@@ -50,7 +57,7 @@ export function VehicleGridSkeleton({
   const t = useDict();
   return (
     <div
-      className={view === "grid" ? "grid gap-5 sm:grid-cols-2 xl:grid-cols-3" : "flex flex-col gap-4"}
+      className={view === "grid" ? "grid grid-cols-2 gap-5 xl:grid-cols-3" : "flex flex-col gap-4"}
       aria-busy="true"
       aria-label={t.loadingResults}
     >

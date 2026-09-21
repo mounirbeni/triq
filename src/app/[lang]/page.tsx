@@ -474,7 +474,7 @@ export default async function HomePage() {
             </div>
             <Link href="/cars?deals=1" className="btn btn-ghost btn-sm" transitionTypes={["nav-forward"]}>{t.allCars} <ArrowLeft size={14} className="dir-flip" /></Link>
           </header>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-5 lg:grid-cols-3 xl:grid-cols-4">
             {featuredCars.map((v) => <VehicleCard key={v.id} v={v} compact featured />)}
           </div>
         </div>
@@ -495,7 +495,7 @@ export default async function HomePage() {
             </div>
             <Link href="/motorcycles" className="btn btn-ghost btn-sm" transitionTypes={["nav-forward"]}>{t.allMotos} <ArrowLeft size={14} className="dir-flip" /></Link>
           </header>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-5 lg:grid-cols-3 xl:grid-cols-4">
             {featuredMotos.map((v) => <VehicleCard key={v.id} v={v} compact featured />)}
           </div>
         </div>
@@ -516,7 +516,7 @@ export default async function HomePage() {
             </div>
             <Link href="/vehicles?sort=recent" className="btn btn-ghost btn-sm" transitionTypes={["nav-forward"]}>{t.allListings} <ArrowLeft size={14} className="dir-flip" /></Link>
           </header>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-5 lg:grid-cols-3 xl:grid-cols-4">
             {latestVehicles.map((v) => <VehicleCard key={v.id} v={v} compact />)}
           </div>
         </div>

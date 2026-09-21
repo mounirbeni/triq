@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { CITIES } from "@/lib/cities";
 
 import { paramsFromFilters, type Filters } from "@/lib/search";
@@ -17,7 +17,7 @@ import {
 } from "@/lib/vehicle-options";
 import {
   BadgeCheck, Calendar, Car, Check, Door, Fuel, Gauge, Grid, MapPin, Moto,
-  Palette, Plus, Reset, ShieldCheck, Sparkle, Timer, TrendingDown, Key, Wrench,
+  Palette, Plus, Reset, ShieldCheck, Sliders, Sparkle, Timer, TrendingDown, Key, Wrench,
 } from "@/components/icons";
 import { VehicleGlyph } from "@/components/VehicleArt";
 import {
@@ -37,6 +37,18 @@ const MOTO_SET = MOTO_BODY_SET;
 
 const PRICE_MAX = 600000;
 const KM_MAX = 350000;
+
+/** عنوان صغير كيفرّق بين مجموعات الفلاتر المتقدمة — بلا تفاعل، غير للتصنيف البصري */
+function GroupLabel({ children }: { children: ReactNode }) {
+  return (
+    <p
+      className="pt-2 pb-1.5 text-[10px] font-bold uppercase tracking-wide"
+      style={{ color: "var(--text-dim)" }}
+    >
+      {children}
+    </p>
+  );
+}
 
 export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }: Props) {
   const t = useDict();
@@ -108,6 +120,21 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
     + equipmentTags.length
     + [filters.goodDealsOnly, filters.inspectedOnly, filters.verifiedOnly, filters.firstHandOnly, filters.urgentOnly].filter(Boolean).length;
 
+  /* الفلاتر "المتقدمة" — كل شي ماعدا النوع/الهيكل/الماركة/الثمن/السنة/الكيلومتراج/المدينة،
+     اللي هوما الفلاتر الأساسية اللي غالبية الناس كيقلّبو عليها مباشرة. */
+  const advancedActiveCount =
+    (filters.displacementMin ? 1 : 0) + (filters.displacementMax ? 1 : 0)
+    + (filters.fuel ? 1 : 0) + (filters.gearbox ? 1 : 0)
+    + (filters.powerMin ? 1 : 0) + (filters.powerMax ? 1 : 0)
+    + (filters.drivetrain ? 1 : 0)
+    + (filters.condition ? 1 : 0)
+    + (filters.color ? 1 : 0)
+    + (filters.doors ? 1 : 0)
+    + (filters.origin ? 1 : 0)
+    + equipmentTags.length
+    + (filters.trustMin ? 1 : 0)
+    + [filters.goodDealsOnly, filters.inspectedOnly, filters.verifiedOnly, filters.firstHandOnly, filters.urgentOnly].filter(Boolean).length;
+
   return (
     <div className="card overflow-hidden">
       <div
@@ -150,8 +177,10 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
         </div>
         )}
 
+        {/* ===== الأساسية — اللي غالبية الناس كيقلّبو عليها مباشرة ===== */}
+
         {/* الهيكل */}
-        <FilterSection title={t.filters.body} Icon={Car} activeCount={filters.body ? 1 : 0} defaultOpen={Boolean(filters.body)}>
+        <FilterSection title={t.filters.body} Icon={Car} activeCount={filters.body ? 1 : 0} defaultOpen={true}>
           <IconTiles
             value={filters.body}
             onChange={(b) => set({ body: b })}
@@ -176,7 +205,7 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
           title={lockBrand ? t.filters.modelOnly : t.filters.brandModel}
           Icon={BadgeCheck}
           activeCount={(filters.make && !lockBrand ? 1 : 0) + (filters.model ? 1 : 0)}
-          defaultOpen={Boolean((filters.make && !lockBrand) || filters.model)}
+          defaultOpen={true}
         >
           {!lockBrand && (
           <select
@@ -210,23 +239,6 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
             </select>
           )}
         </FilterSection>
-
-        {filters.kind === "moto" && (
-        <FilterSection title="سعة المحرك" Icon={Gauge} activeCount={(filters.displacementMin ? 1 : 0) + (filters.displacementMax ? 1 : 0)} defaultOpen={Boolean(filters.displacementMin || filters.displacementMax)}>
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              type="number" min={49} max={3000} inputMode="numeric" className="field num" dir="ltr"
-              placeholder="من (سم³)" value={filters.displacementMin ?? ""}
-              onChange={(e) => set({ displacementMin: e.target.value ? Number(e.target.value) : undefined })}
-            />
-            <input
-              type="number" min={49} max={3000} inputMode="numeric" className="field num" dir="ltr"
-              placeholder="إلى (سم³)" value={filters.displacementMax ?? ""}
-              onChange={(e) => set({ displacementMax: e.target.value ? Number(e.target.value) : undefined })}
-            />
-          </div>
-        </FilterSection>
-        )}
 
         {/* الثمن */}
         <FilterSection
@@ -303,131 +315,8 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
           </div>
         </FilterSection>
 
-        {/* الوقود والناقل */}
-        <FilterSection
-          title={t.filters.engine}
-          Icon={Fuel}
-          activeCount={(filters.fuel ? 1 : 0) + (filters.gearbox ? 1 : 0)}
-          defaultOpen={Boolean(filters.fuel || filters.gearbox)}
-        >
-          <ChipToggles
-            value={filters.fuel}
-            onChange={(f) => set({ fuel: f })}
-            options={localizeOptions(FUELS, locale).map((x) => ({ ...x, count: f9s.fuel[x.value] ?? 0 }))}
-          />
-          <div className="mt-2">
-            <ChipToggles
-              value={filters.gearbox}
-              onChange={(g) => set({ gearbox: g })}
-              options={localizeOptions(GEARBOXES, locale).map((g) => ({ ...g, count: f9s.gearbox[g.value] ?? 0 }))}
-            />
-          </div>
-        </FilterSection>
-
-        {/* حالة المركبة */}
-        <FilterSection title={t.filters.condition} Icon={BadgeCheck} activeCount={filters.condition ? 1 : 0} defaultOpen={Boolean(filters.condition)}>
-          <ChipToggles
-            value={filters.condition}
-            onChange={(c) => set({ condition: c })}
-            options={localizeOptions(CONDITIONS, locale).map((c) => ({ ...c, count: f9s.condition[c.value] ?? 0 }))}
-          />
-        </FilterSection>
-
-        {/* اللون */}
-        {Object.keys(f9s.color).length > 0 && (
-        <FilterSection title={t.filters.color} Icon={Palette} activeCount={filters.color ? 1 : 0} defaultOpen={Boolean(filters.color)}>
-          <ChipToggles
-            value={filters.color}
-            onChange={(c) => set({ color: c })}
-            options={Object.entries(f9s.color)
-              .sort((a, b) => b[1] - a[1])
-              .map(([value, n]) => ({ value, label: colorLabel(value, locale), count: n }))}
-          />
-        </FilterSection>
-        )}
-
-        {/* عدد الأبواب — سيارات فقط */}
-        {filters.kind !== "moto" && Object.keys(f9s.doors).length > 0 && (
-        <FilterSection title={t.filters.doors} Icon={Door} activeCount={filters.doors ? 1 : 0} defaultOpen={Boolean(filters.doors)}>
-          <ChipToggles
-            value={filters.doors ? String(filters.doors) : ""}
-            onChange={(v) => set({ doors: v ? Number(v) : undefined })}
-            options={DOOR_OPTIONS.map((d) => ({
-              value: String(d), label: String(d), count: f9s.doors[String(d)] ?? 0,
-            }))}
-          />
-        </FilterSection>
-        )}
-
-        {/* قوة المحرك */}
-        <FilterSection
-          title={t.filters.power}
-          Icon={Gauge}
-          activeCount={(filters.powerMin ? 1 : 0) + (filters.powerMax ? 1 : 0)}
-          defaultOpen={Boolean(filters.powerMin || filters.powerMax)}
-        >
-          <DualRange
-            min={0}
-            max={POWER_MAX}
-            step={1}
-            low={filters.powerMin}
-            high={filters.powerMax}
-            histogram={f9s.powerHist}
-            onChange={(lo, hi) => set({ powerMin: lo, powerMax: hi })}
-            format={(n) => `${n} ${t.filters.hp}`}
-          />
-        </FilterSection>
-
-        {/* الدفع — سيارات فقط */}
-        {filters.kind !== "moto" && (
-        <FilterSection title={t.filters.drivetrain} Icon={Car} activeCount={filters.drivetrain ? 1 : 0} defaultOpen={Boolean(filters.drivetrain)}>
-          <ChipToggles
-            value={filters.drivetrain}
-            onChange={(d) => set({ drivetrain: d })}
-            options={localizeOptions(DRIVETRAINS, locale).map((d) => ({ ...d, count: f9s.drivetrain[d.value] ?? 0 }))}
-          />
-        </FilterSection>
-        )}
-
-        {/* مصدر السيارة */}
-        <FilterSection title={t.filters.origin} Icon={MapPin} activeCount={filters.origin ? 1 : 0} defaultOpen={Boolean(filters.origin)}>
-          <ChipToggles
-            value={filters.origin}
-            onChange={(o) => set({ origin: o })}
-            options={localizeOptions(ORIGINS, locale).map((o) => ({ ...o, count: f9s.origin[o.value] ?? 0 }))}
-          />
-        </FilterSection>
-
-        {/* المواصفات والخيارات */}
-        <FilterSection title={t.filters.equipment} Icon={Sparkle} activeCount={equipmentTags.length} defaultOpen={equipmentTags.length > 0}>
-          <div className="flex flex-wrap gap-1.5">
-            {EQUIPMENT.map((eq) => {
-              const on = equipmentTags.includes(eq);
-              const n = f9s.equipment[eq] ?? 0;
-              return (
-                <button
-                  key={eq}
-                  type="button"
-                  onClick={() => toggleEquipment(eq)}
-                  aria-pressed={on}
-                  disabled={n === 0 && !on}
-                  className="chip transition disabled:opacity-30"
-                  style={{
-                    background: on ? "var(--brand)" : "var(--surface-3)",
-                    color: on ? "var(--brand-ink)" : "var(--text-muted)",
-                    borderColor: "transparent",
-                  }}
-                >
-                  {on ? <Check size={11} /> : <Plus size={11} />}{equipmentLabel(eq, locale)}
-                  <span className="num opacity-55">{n}</span>
-                </button>
-              );
-            })}
-          </div>
-        </FilterSection>
-
         {/* المدينة */}
-        <FilterSection title={t.filters.city} Icon={MapPin} activeCount={filters.city ? 1 : 0} defaultOpen={Boolean(filters.city)}>
+        <FilterSection title={t.filters.city} Icon={MapPin} activeCount={filters.city ? 1 : 0} defaultOpen={true}>
           <ChipToggles
             value={filters.city}
             onChange={(c) => set({ city: c })}
@@ -444,77 +333,229 @@ export function FiltersPanel({ filters, set, reset, count, lockKind, lockBrand }
           )}
         </FilterSection>
 
-        {/* الثقة */}
-        <FilterSection title={t.filters.trust} Icon={ShieldCheck} activeCount={filters.trustMin ? 1 : 0} defaultOpen={Boolean(filters.trustMin)}>
-          <input
-            type="range"
-            min={0}
-            max={90}
-            step={5}
-            value={filters.trustMin ?? 0}
-            onChange={(e) => set({ trustMin: Number(e.target.value) || undefined })}
-            aria-label={t.filters.minTrust}
-          />
-          <div className="flex justify-between text-[11px] font-bold" style={{ color: "var(--text-muted)" }}>
-            <span>{t.filters.all}</span>
-            <span style={{ color: filters.trustMin ? "var(--brand)" : undefined }}>
-              {filters.trustMin ? (
-                <><span className="num">{filters.trustMin}</span>+ {t.filters.outOf100}</>
-              ) : (
-                t.filters.noLimit
-              )}
-            </span>
-          </div>
-        </FilterSection>
-
-        {/* الضمانات */}
+        {/* ===== فلاتر متقدمة — للي بغا يدقّق أكثر ===== */}
         <FilterSection
-          title={t.filters.guarantees}
-          Icon={ShieldCheck}
-          activeCount={[filters.goodDealsOnly, filters.inspectedOnly, filters.verifiedOnly, filters.firstHandOnly, filters.urgentOnly].filter(Boolean).length}
-          defaultOpen={[filters.goodDealsOnly, filters.inspectedOnly, filters.verifiedOnly, filters.firstHandOnly, filters.urgentOnly].some(Boolean)}
+          title={t.filters.advanced}
+          Icon={Sliders}
+          activeCount={advancedActiveCount}
+          defaultOpen={advancedActiveCount > 0}
         >
-          <div className="grid gap-1.5">
-            <SwitchRow
-              Icon={TrendingDown}
-              label={t.filters.goodDeals}
-              hint={t.filters.goodDealsHint}
-              checked={filters.goodDealsOnly}
-              onChange={(b) => set({ goodDealsOnly: b })}
-              count={flagCount("goodDealsOnly")}
+          <GroupLabel>{t.filters.mechanical}</GroupLabel>
+
+          {filters.kind === "moto" && (
+          <FilterSection title="سعة المحرك" Icon={Gauge} activeCount={(filters.displacementMin ? 1 : 0) + (filters.displacementMax ? 1 : 0)} defaultOpen={Boolean(filters.displacementMin || filters.displacementMax)}>
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                type="number" min={49} max={3000} inputMode="numeric" className="field num" dir="ltr"
+                placeholder="من (سم³)" value={filters.displacementMin ?? ""}
+                onChange={(e) => set({ displacementMin: e.target.value ? Number(e.target.value) : undefined })}
+              />
+              <input
+                type="number" min={49} max={3000} inputMode="numeric" className="field num" dir="ltr"
+                placeholder="إلى (سم³)" value={filters.displacementMax ?? ""}
+                onChange={(e) => set({ displacementMax: e.target.value ? Number(e.target.value) : undefined })}
+              />
+            </div>
+          </FilterSection>
+          )}
+
+          {/* الوقود والناقل */}
+          <FilterSection
+            title={t.filters.engine}
+            Icon={Fuel}
+            activeCount={(filters.fuel ? 1 : 0) + (filters.gearbox ? 1 : 0)}
+            defaultOpen={Boolean(filters.fuel || filters.gearbox)}
+          >
+            <ChipToggles
+              value={filters.fuel}
+              onChange={(f) => set({ fuel: f })}
+              options={localizeOptions(FUELS, locale).map((x) => ({ ...x, count: f9s.fuel[x.value] ?? 0 }))}
             />
-            <SwitchRow
-              Icon={Wrench}
-              label={t.filters.inspected}
-              hint={t.filters.inspectedHint}
-              checked={filters.inspectedOnly}
-              onChange={(b) => set({ inspectedOnly: b })}
-              count={flagCount("inspectedOnly")}
+            <div className="mt-2">
+              <ChipToggles
+                value={filters.gearbox}
+                onChange={(g) => set({ gearbox: g })}
+                options={localizeOptions(GEARBOXES, locale).map((g) => ({ ...g, count: f9s.gearbox[g.value] ?? 0 }))}
+              />
+            </div>
+          </FilterSection>
+
+          {/* قوة المحرك */}
+          <FilterSection
+            title={t.filters.power}
+            Icon={Gauge}
+            activeCount={(filters.powerMin ? 1 : 0) + (filters.powerMax ? 1 : 0)}
+            defaultOpen={Boolean(filters.powerMin || filters.powerMax)}
+          >
+            <DualRange
+              min={0}
+              max={POWER_MAX}
+              step={1}
+              low={filters.powerMin}
+              high={filters.powerMax}
+              histogram={f9s.powerHist}
+              onChange={(lo, hi) => set({ powerMin: lo, powerMax: hi })}
+              format={(n) => `${n} ${t.filters.hp}`}
             />
-            <SwitchRow
-              Icon={BadgeCheck}
-              label={t.filters.verified}
-              checked={filters.verifiedOnly}
-              onChange={(b) => set({ verifiedOnly: b })}
-              count={flagCount("verifiedOnly")}
+          </FilterSection>
+
+          {/* الدفع — سيارات فقط */}
+          {filters.kind !== "moto" && (
+          <FilterSection title={t.filters.drivetrain} Icon={Car} activeCount={filters.drivetrain ? 1 : 0} defaultOpen={Boolean(filters.drivetrain)}>
+            <ChipToggles
+              value={filters.drivetrain}
+              onChange={(d) => set({ drivetrain: d })}
+              options={localizeOptions(DRIVETRAINS, locale).map((d) => ({ ...d, count: f9s.drivetrain[d.value] ?? 0 }))}
             />
-            <SwitchRow
-              Icon={Key}
-              label={t.filters.firstHand}
-              hint={t.filters.firstHandHint}
-              checked={filters.firstHandOnly}
-              onChange={(b) => set({ firstHandOnly: b })}
-              count={flagCount("firstHandOnly")}
+          </FilterSection>
+          )}
+
+          <GroupLabel>{t.filters.specs}</GroupLabel>
+
+          {/* حالة المركبة */}
+          <FilterSection title={t.filters.condition} Icon={BadgeCheck} activeCount={filters.condition ? 1 : 0} defaultOpen={Boolean(filters.condition)}>
+            <ChipToggles
+              value={filters.condition}
+              onChange={(c) => set({ condition: c })}
+              options={localizeOptions(CONDITIONS, locale).map((c) => ({ ...c, count: f9s.condition[c.value] ?? 0 }))}
             />
-            <SwitchRow
-              Icon={Timer}
-              label={t.filters.urgent}
-              hint={t.filters.urgentHint}
-              checked={filters.urgentOnly}
-              onChange={(b) => set({ urgentOnly: b })}
-              count={flagCount("urgentOnly")}
+          </FilterSection>
+
+          {/* اللون */}
+          {Object.keys(f9s.color).length > 0 && (
+          <FilterSection title={t.filters.color} Icon={Palette} activeCount={filters.color ? 1 : 0} defaultOpen={Boolean(filters.color)}>
+            <ChipToggles
+              value={filters.color}
+              onChange={(c) => set({ color: c })}
+              options={Object.entries(f9s.color)
+                .sort((a, b) => b[1] - a[1])
+                .map(([value, n]) => ({ value, label: colorLabel(value, locale), count: n }))}
             />
-          </div>
+          </FilterSection>
+          )}
+
+          {/* عدد الأبواب — سيارات فقط */}
+          {filters.kind !== "moto" && Object.keys(f9s.doors).length > 0 && (
+          <FilterSection title={t.filters.doors} Icon={Door} activeCount={filters.doors ? 1 : 0} defaultOpen={Boolean(filters.doors)}>
+            <ChipToggles
+              value={filters.doors ? String(filters.doors) : ""}
+              onChange={(v) => set({ doors: v ? Number(v) : undefined })}
+              options={DOOR_OPTIONS.map((d) => ({
+                value: String(d), label: String(d), count: f9s.doors[String(d)] ?? 0,
+              }))}
+            />
+          </FilterSection>
+          )}
+
+          {/* مصدر السيارة */}
+          <FilterSection title={t.filters.origin} Icon={MapPin} activeCount={filters.origin ? 1 : 0} defaultOpen={Boolean(filters.origin)}>
+            <ChipToggles
+              value={filters.origin}
+              onChange={(o) => set({ origin: o })}
+              options={localizeOptions(ORIGINS, locale).map((o) => ({ ...o, count: f9s.origin[o.value] ?? 0 }))}
+            />
+          </FilterSection>
+
+          {/* المواصفات والخيارات */}
+          <FilterSection title={t.filters.equipment} Icon={Sparkle} activeCount={equipmentTags.length} defaultOpen={equipmentTags.length > 0}>
+            <div className="flex flex-wrap gap-1.5">
+              {EQUIPMENT.map((eq) => {
+                const on = equipmentTags.includes(eq);
+                const n = f9s.equipment[eq] ?? 0;
+                return (
+                  <button
+                    key={eq}
+                    type="button"
+                    onClick={() => toggleEquipment(eq)}
+                    aria-pressed={on}
+                    disabled={n === 0 && !on}
+                    className="chip transition disabled:opacity-30"
+                    style={{
+                      background: on ? "var(--brand)" : "var(--surface-3)",
+                      color: on ? "var(--brand-ink)" : "var(--text-muted)",
+                      borderColor: "transparent",
+                    }}
+                  >
+                    {on ? <Check size={11} /> : <Plus size={11} />}{equipmentLabel(eq, locale)}
+                    <span className="num opacity-55">{n}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </FilterSection>
+
+          {/* الثقة */}
+          <FilterSection title={t.filters.trust} Icon={ShieldCheck} activeCount={filters.trustMin ? 1 : 0} defaultOpen={Boolean(filters.trustMin)}>
+            <input
+              type="range"
+              min={0}
+              max={90}
+              step={5}
+              value={filters.trustMin ?? 0}
+              onChange={(e) => set({ trustMin: Number(e.target.value) || undefined })}
+              aria-label={t.filters.minTrust}
+            />
+            <div className="flex justify-between text-[11px] font-bold" style={{ color: "var(--text-muted)" }}>
+              <span>{t.filters.all}</span>
+              <span style={{ color: filters.trustMin ? "var(--brand)" : undefined }}>
+                {filters.trustMin ? (
+                  <><span className="num">{filters.trustMin}</span>+ {t.filters.outOf100}</>
+                ) : (
+                  t.filters.noLimit
+                )}
+              </span>
+            </div>
+          </FilterSection>
+
+          {/* الضمانات */}
+          <FilterSection
+            title={t.filters.guarantees}
+            Icon={ShieldCheck}
+            activeCount={[filters.goodDealsOnly, filters.inspectedOnly, filters.verifiedOnly, filters.firstHandOnly, filters.urgentOnly].filter(Boolean).length}
+            defaultOpen={[filters.goodDealsOnly, filters.inspectedOnly, filters.verifiedOnly, filters.firstHandOnly, filters.urgentOnly].some(Boolean)}
+          >
+            <div className="grid gap-1.5">
+              <SwitchRow
+                Icon={TrendingDown}
+                label={t.filters.goodDeals}
+                hint={t.filters.goodDealsHint}
+                checked={filters.goodDealsOnly}
+                onChange={(b) => set({ goodDealsOnly: b })}
+                count={flagCount("goodDealsOnly")}
+              />
+              <SwitchRow
+                Icon={Wrench}
+                label={t.filters.inspected}
+                hint={t.filters.inspectedHint}
+                checked={filters.inspectedOnly}
+                onChange={(b) => set({ inspectedOnly: b })}
+                count={flagCount("inspectedOnly")}
+              />
+              <SwitchRow
+                Icon={BadgeCheck}
+                label={t.filters.verified}
+                checked={filters.verifiedOnly}
+                onChange={(b) => set({ verifiedOnly: b })}
+                count={flagCount("verifiedOnly")}
+              />
+              <SwitchRow
+                Icon={Key}
+                label={t.filters.firstHand}
+                hint={t.filters.firstHandHint}
+                checked={filters.firstHandOnly}
+                onChange={(b) => set({ firstHandOnly: b })}
+                count={flagCount("firstHandOnly")}
+              />
+              <SwitchRow
+                Icon={Timer}
+                label={t.filters.urgent}
+                hint={t.filters.urgentHint}
+                checked={filters.urgentOnly}
+                onChange={(b) => set({ urgentOnly: b })}
+                count={flagCount("urgentOnly")}
+              />
+            </div>
+          </FilterSection>
         </FilterSection>
       </div>
 

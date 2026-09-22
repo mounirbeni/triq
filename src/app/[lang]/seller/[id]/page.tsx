@@ -89,11 +89,6 @@ export default async function SellerPage({ params }: { params: Promise<{ id: str
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="h-section">{displayName}</h1>
               {seller.founder && <FounderBadge />}
-              {seller.idVerified && (
-                <span className="tag" style={{ background: "var(--good)", color: "#fff" }}>
-                  <BadgeCheck size={11} /> {p.verifiedAccount}
-                </span>
-              )}
             </div>
             <p className="mt-1 flex items-center gap-1.5 text-[13px]" style={{ color: "var(--text-muted)" }}>
               <MapPin size={13} /> {cityLabel(seller.city, locale)} · {p.memberSince} <span className="num">{seller.since}</span>
@@ -114,30 +109,39 @@ export default async function SellerPage({ params }: { params: Promise<{ id: str
           </div>
         </div>
 
-        {/* الأرقام */}
-        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
+        {/* الأرقام — عدد الأعمدة كيتبع عدد البطاقات الحقيقية، بلا ماتخلي
+            بلايص خاوية إلا كانت الشبكة أوسع من البطاقات (بائع بلا تقييم
+            ولا وقت رد، مثلاً) */}
+        {(() => {
+          const statCards = [
             { Icon: Car, v: formatNumber(listings.length), l: p.statActive },
             { Icon: BadgeCheck, v: formatNumber(stats.soldListings), l: p.statSold },
             ...(seller.rating != null ? [{ Icon: Star, v: seller.rating.toFixed(1), l: p.statRating }] : []),
             ...(seller.responseMinutes != null
               ? [{ Icon: Clock, v: `~${seller.responseMinutes}`, l: p.statResponse }]
               : []),
-          ].map((s) => (
-            <div key={s.l} className="card flex items-center gap-3 p-4">
-              <span
-                className="grid h-10 w-10 shrink-0 place-items-center rounded-xl"
-                style={{ background: "var(--brand-soft)", color: "var(--brand)" }}
-              >
-                <s.Icon size={18} />
-              </span>
-              <div className="min-w-0">
-                <div className="num text-lg font-extrabold">{s.v}</div>
-                <div className="truncate text-[10.5px]" style={{ color: "var(--text-dim)" }}>{s.l}</div>
-              </div>
+          ];
+          const smCols =
+            statCards.length >= 4 ? "sm:grid-cols-4" : statCards.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2";
+          return (
+            <div className={`mt-8 grid grid-cols-2 gap-3 ${smCols}`}>
+              {statCards.map((s) => (
+                <div key={s.l} className="card flex items-center gap-3 p-4">
+                  <span
+                    className="grid h-10 w-10 shrink-0 place-items-center rounded-xl"
+                    style={{ background: "var(--brand-soft)", color: "var(--brand)" }}
+                  >
+                    <s.Icon size={18} />
+                  </span>
+                  <div className="min-w-0">
+                    <div className="num text-lg font-extrabold">{s.v}</div>
+                    <div className="truncate text-[10.5px]" style={{ color: "var(--text-dim)" }}>{s.l}</div>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          );
+        })()}
 
         {/* الإعلانات */}
         <section className="mt-10 pb-16">

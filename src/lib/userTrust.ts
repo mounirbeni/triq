@@ -28,6 +28,8 @@ export interface UserTrustInput {
   avgListingTrust: number | null;
   /** بلاغات تّحسمات ضد إعلاناته */
   negativeReports: number;
+  /** حساب صاحب المنصة — موثوق بطبيعتو، بحال توثيق الهوية اللي كيتفرض ليه تلقائياً فـauth.ts */
+  founder?: boolean;
 }
 
 export interface UserTrustPart {
@@ -132,11 +134,18 @@ export function userTrustScore(input: UserTrustInput, locale: Locale = "ar"): Us
     },
   ];
 
+  /* المؤسس (صاحب المنصة) كيبقى ديما 100% — نفس المنطق اللي كيفرض
+     ليه توثيق الهوية تلقائياً، ماشي معقول نطالبوه بـ12 شهر نشاط
+     ولا إعلانات باش يوصل لثقة كاملة فمنصتو ديالو. */
+  const finalParts = input.founder
+    ? parts.map((p) => ({ ...p, score: p.max, done: true, action: null }))
+    : parts;
+
   const score = Math.max(
     0,
-    Math.min(100, Math.round(parts.reduce((s, p) => s + p.score, 0))),
+    Math.min(100, Math.round(finalParts.reduce((s, p) => s + p.score, 0))),
   );
   const level = levelOf(score);
 
-  return { score, level, levelLabel: (fr ? LEVEL_LABEL_FR : LEVEL_LABEL)[level], parts };
+  return { score, level, levelLabel: (fr ? LEVEL_LABEL_FR : LEVEL_LABEL)[level], parts: finalParts };
 }

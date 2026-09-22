@@ -43,6 +43,7 @@ export default async function TrustCenterPage() {
     activeListings: stats.activeListings,
     avgListingTrust: stats.avgTrust,
     negativeReports: stats.negativeReports,
+    founder: user.founder,
   }, locale);
 
   const badges = userBadges({

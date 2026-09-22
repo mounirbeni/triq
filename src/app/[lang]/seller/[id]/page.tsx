@@ -7,11 +7,11 @@ import { dictionaryOf, getDictionary, getLocale } from "@/lib/i18n/server";
 import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
 import { localeAlternates } from "@/lib/site";
 import { cityLabel, sellerDisplayName } from "@/lib/i18n/labels";
-import { VehicleCard } from "@/components/VehicleCard";
+import { SellerListingsGrid } from "@/components/SellerListingsGrid";
 import { Avatar } from "@/components/Avatar";
 import { FounderBadge } from "@/components/FounderBadge";
 import {
-  BadgeCheck, Car, Clock, MapPin, ShieldCheck, Star, Users,
+  BadgeCheck, Car, Clock, MapPin, ShieldCheck, Star,
 } from "@/components/icons";
 
 /* الصفحة كتّرندر عند كل طلب — نفس سبب /dealer/[slug]: التخطيط
@@ -65,25 +65,37 @@ export default async function SellerPage({ params }: { params: Promise<{ id: str
     trustLevel,
   });
 
-  const cars = listings.filter((v) => v.kind === "car").length;
-  const motos = listings.length - cars;
-
   return (
     <div>
       <div
-        className="relative h-32 sm:h-40"
-        style={{ background: "linear-gradient(120deg, var(--brand), var(--data))" }}
+        className="relative h-44 overflow-hidden sm:h-60"
+        style={{ background: "linear-gradient(135deg, var(--brand), var(--data))" }}
       >
-        <div className="zellige absolute inset-0 opacity-40" />
+        {/* بريق علوي خفيف كيعطي عمق زجاجي */}
+        <div
+          className="absolute inset-0"
+          style={{ background: "radial-gradient(60% 80% at 18% -10%, rgba(255,255,255,0.22), transparent 60%)" }}
+        />
+        <div className="zellige absolute inset-0 opacity-30" />
+        {/* تلاشي سلس لتحت — بلا خط حاد بين الغلاف وخلفية الصفحة */}
+        <div
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(to bottom, transparent 45%, var(--bg) 100%)" }}
+        />
       </div>
 
       <div className="mx-auto max-w-[1200px] px-4">
-        <div className="relative z-10 -mt-12 flex flex-wrap items-end gap-4">
+        <div className="relative z-10 -mt-16 flex flex-wrap items-end gap-5">
           <Avatar
             src={seller.avatarUrl}
             name={displayName}
-            className="h-20 w-20 rounded-3xl border-4 text-3xl"
-            style={{ background: "var(--surface-1)", borderColor: "var(--bg)", color: "var(--brand)" }}
+            className="h-28 w-28 rounded-3xl border-4 text-4xl"
+            style={{
+              background: "var(--surface-1)",
+              borderColor: "var(--bg)",
+              color: "var(--brand)",
+              boxShadow: "var(--shadow-lg)",
+            }}
           />
           <div className="min-w-0 flex-1 pb-1">
             <div className="flex flex-wrap items-center gap-2">
@@ -124,7 +136,7 @@ export default async function SellerPage({ params }: { params: Promise<{ id: str
           const smCols =
             statCards.length >= 4 ? "sm:grid-cols-4" : statCards.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2";
           return (
-            <div className={`mt-8 grid grid-cols-2 gap-3 ${smCols}`}>
+            <div className={`mt-10 grid grid-cols-2 gap-3 ${smCols}`}>
               {statCards.map((s) => (
                 <div key={s.l} className="card flex items-center gap-3 p-4">
                   <span
@@ -145,26 +157,8 @@ export default async function SellerPage({ params }: { params: Promise<{ id: str
 
         {/* الإعلانات */}
         <section className="mt-10 pb-16">
-          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-            <h2 className="h-section">{p.listingsOf} {displayName}</h2>
-            {listings.length > 0 && (
-              <p className="text-xs" style={{ color: "var(--text-dim)" }}>
-                <span className="num">{cars}</span> {p.carSuffix} · <span className="num">{motos}</span> {p.motoSuffix}
-              </p>
-            )}
-          </div>
-          {listings.length ? (
-            <div className="grid grid-cols-2 gap-5 xl:grid-cols-3">
-              {listings.map((v) => <VehicleCard key={v.id} v={v} compact />)}
-            </div>
-          ) : (
-            <div className="card flex flex-col items-center gap-2 p-10 text-center">
-              <Users size={22} style={{ color: "var(--text-dim)" }} />
-              <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-                {p.noActiveListings}
-              </p>
-            </div>
-          )}
+          <h2 className="mb-5 h-section">{p.listingsOf} {displayName}</h2>
+          <SellerListingsGrid listings={listings} />
         </section>
 
         <div

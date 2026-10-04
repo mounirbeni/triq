@@ -38,7 +38,9 @@ export default async function SearchPage() {
         </Suspense>
       </div>
 
-      <AdvancedSearch />
+      <Suspense fallback={null}>
+        <AdvancedSearch />
+      </Suspense>
     </div>
   );
 }

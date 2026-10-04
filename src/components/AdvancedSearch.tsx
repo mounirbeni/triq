@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { CITIES } from "@/lib/cities";
 
-import { paramsFromFilters, type Filters } from "@/lib/search";
+import { filtersFromParams, paramsFromFilters, type Filters } from "@/lib/search";
 import { emptyFacets, POWER_MAX, type Facets } from "@/lib/facets";
 import { formatNumber } from "@/lib/format";
 import { EQUIPMENT } from "@/lib/equipment";
@@ -37,7 +37,14 @@ export function AdvancedSearch() {
   const locale = useLocale();
   const href = useHref();
   const L = specs(locale);
-  const [f, setF] = useState<Partial<Filters>>({ kind: "car" });
+  const sp = useSearchParams();
+  /* كتجي فلاتر SmartSearch (مثلاً make=BMW) فالرابط — خاصها تعمر النموذج
+     بلا ما تبقى على "جميع الماركات" رغم اختيار المستخدم. */
+  const [f, setF] = useState<Partial<Filters>>(() => {
+    const fromUrl = filtersFromParams(new URLSearchParams(sp.toString()));
+    if (!sp.get("kind")) fromUrl.kind = "car";
+    return fromUrl;
+  });
   const set = (patch: Partial<Filters>) => setF((p) => ({ ...p, ...patch }));
   /* الميكانيك/المواصفات/الضمانات وراء زر واحد — أغلب الناس كيبحثو
      بالماركة والموديل والثمن والسنة، وقلّة كيدقّقو أكثر من هادشي. */

@@ -794,9 +794,11 @@ export default async function HomePage() {
                 className="h-full w-full"
                 label={`${hero.make} ${hero.model}`}
               />
-              <span className="tag absolute top-3 start-3" style={{ background: "var(--good)", color: "#fff" }}>
-                <BadgeCheck size={12} /> {t.inspectedByTriq}
-              </span>
+              {hero.inspected && (
+                <span className="tag absolute top-3 start-3" style={{ background: "var(--good)", color: "#fff" }}>
+                  <BadgeCheck size={12} /> {t.inspectedByTriq}
+                </span>
+              )}
             </div>
 
             <div className="p-5">

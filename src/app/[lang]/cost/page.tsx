@@ -3,13 +3,19 @@ import { CostClient } from "@/components/CostClient";
 import { Calculator, Coins, Info } from "@/components/icons";
 import { dictionaryOf, getDictionary } from "@/lib/i18n/server";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 
 export async function generateMetadata({
   params,
 }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params;
-  const t = await dictionaryOf(isLocale(lang) ? lang : DEFAULT_LOCALE);
-  return { title: t.costPage.metaTitle, description: t.costPage.metaDesc };
+  const locale = isLocale(lang) ? lang : DEFAULT_LOCALE;
+  const t = await dictionaryOf(locale);
+  return {
+    title: t.costPage.metaTitle,
+    description: t.costPage.metaDesc,
+    alternates: localeAlternates("/cost", locale),
+  };
 }
 
 export default async function CostPage() {

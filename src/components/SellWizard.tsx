@@ -296,7 +296,7 @@ export function SellWizard() {
   /* الماركات والموديلات كيجيو من قاعدة البيانات */
   const { makesFor, modelsFor } = useCatalog();
   const makes = useMemo(() => makesFor(d.kind), [makesFor, d.kind]);
-  const models = useMemo(() => modelsFor(d.make), [modelsFor, d.make]);
+  const models = useMemo(() => modelsFor(d.make, d.kind), [modelsFor, d.make, d.kind]);
 
   const { estimate } = useEstimate({
     kind: d.kind,

@@ -5,13 +5,19 @@ import { SellWizard } from "@/components/SellWizard";
 import { Coins } from "@/components/icons";
 import { dictionaryOf, getDictionary, getLocale } from "@/lib/i18n/server";
 import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 
 export async function generateMetadata({
   params,
 }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params;
-  const t = await dictionaryOf(isLocale(lang) ? lang : DEFAULT_LOCALE);
-  return { title: t.sellPage.metaTitle, description: t.sellPage.metaDesc };
+  const locale = isLocale(lang) ? lang : DEFAULT_LOCALE;
+  const t = await dictionaryOf(locale);
+  return {
+    title: t.sellPage.metaTitle,
+    description: t.sellPage.metaDesc,
+    alternates: localeAlternates("/sell", locale),
+  };
 }
 
 export default async function SellPage() {

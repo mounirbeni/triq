@@ -2,13 +2,19 @@ import type { Metadata } from "next";
 import { CompareClient } from "@/components/CompareClient";
 import { dictionaryOf, getDictionary } from "@/lib/i18n/server";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 
 export async function generateMetadata({
   params,
 }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params;
-  const t = await dictionaryOf(isLocale(lang) ? lang : DEFAULT_LOCALE);
-  return { title: t.comparePage.metaTitle, description: t.comparePage.metaDesc };
+  const locale = isLocale(lang) ? lang : DEFAULT_LOCALE;
+  const t = await dictionaryOf(locale);
+  return {
+    title: t.comparePage.metaTitle,
+    description: t.comparePage.metaDesc,
+    alternates: localeAlternates("/compare", locale),
+  };
 }
 
 export default async function ComparePage() {

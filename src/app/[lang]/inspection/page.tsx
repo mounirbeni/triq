@@ -4,6 +4,7 @@ import { VehicleCard } from "@/components/VehicleCard";
 import { findAll } from "@/lib/source";
 import { dictionaryOf, getDictionary } from "@/lib/i18n/server";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
+import { localeAlternates } from "@/lib/site";
 import {
   AirCon, ArrowLeft, BadgeCheck, Battery, Belt, BrakePad, BrakeRotor, Car,
   ClipboardCheck, Clock, Diagnostic, EngineBlock, FileText, Gauge, Headlight,
@@ -16,8 +17,13 @@ export async function generateMetadata({
   params,
 }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params;
-  const t = await dictionaryOf(isLocale(lang) ? lang : DEFAULT_LOCALE);
-  return { title: t.inspectionPage.metaTitle, description: t.inspectionPage.metaDesc };
+  const locale = isLocale(lang) ? lang : DEFAULT_LOCALE;
+  const t = await dictionaryOf(locale);
+  return {
+    title: t.inspectionPage.metaTitle,
+    description: t.inspectionPage.metaDesc,
+    alternates: localeAlternates("/inspection", locale),
+  };
 }
 
 const SECTION_META = [

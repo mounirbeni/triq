@@ -47,7 +47,9 @@ export function useCatalog() {
   );
 
   const modelsFor = useCallback(
-    (make: string) => [...new Set(rows.filter((r) => r.make === make).map((r) => r.model))].sort(),
+    (make: string, kind?: "car" | "moto") => [...new Set(
+      rows.filter((r) => r.make === make && (!kind || r.kind === kind)).map((r) => r.model),
+    )].sort(),
     [rows],
   );
 

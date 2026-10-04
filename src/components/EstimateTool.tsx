@@ -49,20 +49,20 @@ export function EstimateTool() {
     };
   }, []);
   const makes = useMemo(() => makesFor(kind), [makesFor, kind]);
-  const models = useMemo(() => modelsFor(make), [modelsFor, make]);
+  const models = useMemo(() => modelsFor(make, kind), [modelsFor, make, kind]);
 
   function changeKind(k: "car" | "moto") {
     setKind(k);
     const m = makesFor(k)[0];
     setMake(m);
-    setModel(modelsFor(m)[0] ?? "");
+    setModel(modelsFor(m, k)[0] ?? "");
     setKm(k === "moto" ? 20000 : 120000);
     setFuel(k === "moto" ? "essence" : "diesel");
   }
 
   function changeMake(m: string) {
     setMake(m);
-    setModel(modelsFor(m)[0] ?? "");
+    setModel(modelsFor(m, kind)[0] ?? "");
   }
 
   const { estimate: est } = useEstimate({

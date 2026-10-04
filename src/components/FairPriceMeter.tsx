@@ -93,55 +93,59 @@ export function FairPriceMeter({ fp }: { fp: FairPrice }) {
         </p>
       )}
 
-      <div className="relative pt-8">
-        <div
-          className="h-2.5 rounded-full"
-          style={{
-            background: `linear-gradient(to ${rtl ? "left" : "right"}, color-mix(in oklab, var(--bad) 65%, transparent), color-mix(in oklab, var(--warn) 65%, transparent), color-mix(in oklab, var(--good) 65%, transparent))`,
-          }}
-        />
-        <div
-          className="absolute top-0 flex flex-col items-center"
-          style={{ left: `${markerLeft}%`, transform: "translateX(-50%)" }}
-        >
-          <span
-            className="rounded-md px-2 py-1 text-[10.5px] font-extrabold whitespace-nowrap"
-            style={{ background: color, color: "#0a1e3d" }}
-          >
-            {t.fairPrice.thisListing}
-          </span>
-          <span className="h-2.5 w-0.5" style={{ background: color }} />
-        </div>
-      </div>
-
-      <div className="mt-3 flex justify-between text-[11px]" style={{ color: "var(--text-dim)" }}>
-        <span className="flex items-center gap-1"><TrendingUp size={11} /><Price value={fp.estimate.high} tone="inherit" /></span>
-        <span className="font-bold" style={{ color: "var(--text-muted)" }}>
-          {t.fairPrice.reference} <Price value={fp.estimate.mid} tone="inherit" />
-        </span>
-        <span className="flex items-center gap-1"><Price value={fp.estimate.low} tone="inherit" /><TrendingDown size={11} /></span>
-      </div>
-
-      <div
-        className="mt-5 grid grid-cols-2 gap-4 border-t pt-4"
-        style={{ borderColor: "var(--line-soft)" }}
-      >
-        <div className="stat">
-          <span className="stat-label">{t.fairPrice.deltaLabel}</span>
-          <span className="stat-value text-base" style={{ color: fp.weak ? "var(--text-muted)" : color }}>
-            <Price value={fp.deltaDh} sign tone="inherit" />
-          </span>
-        </div>
-        <div className="stat">
-          <span className="stat-label">{t.fairPrice.confidence}</span>
-          <div className="flex items-center gap-2">
-            <div className="meter flex-1" style={{ height: 5 }}>
-              <i style={{ width: `${conf}%`, background: "var(--data)" }} />
+      {!fp.weak && (
+        <>
+          <div className="relative pt-8">
+            <div
+              className="h-2.5 rounded-full"
+              style={{
+                background: `linear-gradient(to ${rtl ? "left" : "right"}, color-mix(in oklab, var(--bad) 65%, transparent), color-mix(in oklab, var(--warn) 65%, transparent), color-mix(in oklab, var(--good) 65%, transparent))`,
+              }}
+            />
+            <div
+              className="absolute top-0 flex flex-col items-center"
+              style={{ left: `${markerLeft}%`, transform: "translateX(-50%)" }}
+            >
+              <span
+                className="rounded-md px-2 py-1 text-[10.5px] font-extrabold whitespace-nowrap"
+                style={{ background: color, color: "#0a1e3d" }}
+              >
+                {t.fairPrice.thisListing}
+              </span>
+              <span className="h-2.5 w-0.5" style={{ background: color }} />
             </div>
-            <span className="num text-xs font-bold" style={{ color: "var(--data)" }}>{conf}{t.fairPrice.percent}</span>
           </div>
-        </div>
-      </div>
+
+          <div className="mt-3 flex justify-between text-[11px]" style={{ color: "var(--text-dim)" }}>
+            <span className="flex items-center gap-1"><TrendingUp size={11} /><Price value={fp.estimate.high} tone="inherit" /></span>
+            <span className="font-bold" style={{ color: "var(--text-muted)" }}>
+              {t.fairPrice.reference} <Price value={fp.estimate.mid} tone="inherit" />
+            </span>
+            <span className="flex items-center gap-1"><Price value={fp.estimate.low} tone="inherit" /><TrendingDown size={11} /></span>
+          </div>
+
+          <div
+            className="mt-5 grid grid-cols-2 gap-4 border-t pt-4"
+            style={{ borderColor: "var(--line-soft)" }}
+          >
+            <div className="stat">
+              <span className="stat-label">{t.fairPrice.deltaLabel}</span>
+              <span className="stat-value text-base" style={{ color }}>
+                <Price value={fp.deltaDh} sign tone="inherit" />
+              </span>
+            </div>
+            <div className="stat">
+              <span className="stat-label">{t.fairPrice.confidence}</span>
+              <div className="flex items-center gap-2">
+                <div className="meter flex-1" style={{ height: 5 }}>
+                  <i style={{ width: `${conf}%`, background: "var(--data)" }} />
+                </div>
+                <span className="num text-xs font-bold" style={{ color: "var(--data)" }}>{conf}{t.fairPrice.percent}</span>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </section>
   );
 }
